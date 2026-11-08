@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tkmchw — личный сайт</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Golos+Text:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>
+  // жёсткий сброс скролла: страница всегда открывается с самого верха
+  history.scrollRestoration = 'manual';
+  window.scrollTo(0, 0);
+  addEventListener('load', () => window.scrollTo(0, 0));
+</script>
+<style>
+  :root{
+    --bg:#0c0c0c;
+    --ink:#f0ede8;
+    --red:#e5261f;
+    --dim:#8a8680;
+    --line:#262422;
+    --mono:'IBM Plex Mono', monospace;
+    --disp:'Unbounded', sans-serif;
+    --text:'Golos Text', sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);color:var(--ink);
+    font-family:var(--text);font-size:16px;line-height:1.6;
+    overflow-x:hidden;cursor:none;
+  }
+  ::selection{background:var(--red);color:#fff}
+  a{color:inherit;text-decoration:none;cursor:none}
+  button{cursor:none;font-family:inherit}
+  img{display:block;max-width:100%}
+
+  /* ---------- курсор ---------- */
+  .cursor-dot{position:fixed;top:0;left:0;width:8px;height:8px;background:var(--red);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:background .25s}
+  body.on-red .cursor-dot{background:#0c0c0c}
+  @media (hover:none){.cursor-dot{display:none}body,a,button{cursor:auto}}
+
+  /* ---------- шапка ---------- */
+  header{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    display:flex;justify-content:space-between;align-items:center;
+    padding:18px 32px;mix-blend-mode:difference;
+  }
+  .logo{font-family:var(--disp);font-weight:800;font-size:15px;letter-spacing:.05em;color:#fff}
+  .logo i{font-style:normal;color:var(--red)}
+  nav{display:flex;gap:28px}
+  nav a{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;position:relative;color:#fff}
+  nav a::after{content:'';position:absolute;left:0;bottom:-4px;width:0;height:1px;background:var(--red);transition:width .3s}
+  nav a:hover::after{width:100%}
+  .lang{display:flex;border:1px solid rgba(255,255,255,.4);font-family:var(--mono);font-size:12px;letter-spacing:.08em}
+  .lang button{background:none;border:none;color:#fff;padding:7px 12px;transition:background .3s,color .3s}
+  .lang button.active{background:#fff;color:#000}
+
+  /* ---------- hero ---------- */
+  .hero{height:100vh;height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 32px;position:relative;overflow:hidden}
+  .hero-meta{font-family:var(--mono);font-size:12px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;display:flex;justify-content:space-between;border-top:1px solid var(--line);padding-top:14px;margin-bottom:18px}
+  .hero h1{
+    font-family:var(--disp);font-weight:800;
+    font-size:clamp(40px,9vw,130px);line-height:1.04;
+    text-transform:uppercase;letter-spacing:-.01em;
+  }
+  .hero h1 .row{display:block;overflow:hidden}
+  .hero h1 .row span{display:inline-block;transform:translateY(110%);animation:rise .9s cubic-bezier(.2,.8,.2,1) forwards}
+  .hero h1 .row:nth-child(2) span{animation-delay:.12s}
+  @keyframes rise{to{transform:translateY(0)}}
+  .hero h1 em{font-style:normal;color:var(--red)}
+  .hero-bottom{display:flex;justify-content:space-between;align-items:flex-end;padding:24px 0 30px;gap:24px;flex-wrap:wrap}
+  .hero-bottom p{max-width:460px;color:var(--dim);font-size:15px}
+  .scroll-cue{font-family:var(--mono);font-size:12px;letter-spacing:.15em;color:var(--dim);display:flex;align-items:center;gap:10px}
+  .scroll-cue svg{animation:cue 1.6s ease-in-out infinite}
+  @keyframes cue{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+
+  /* ---------- бегущая строка ---------- */
+  .marquee{border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;padding:14px 0;background:var(--bg)}
+  .marquee-track{display:flex;width:max-content;animation:mq 22s linear infinite}
+  .marquee:hover .marquee-track{animation-play-state:paused}
+  .marquee-track span{font-family:var(--disp);font-weight:400;font-size:14px;text-transform:uppercase;letter-spacing:.14em;padding:0 28px;white-space:nowrap}
+  .marquee-track span b{color:var(--red);font-weight:800;padding-right:56px}
+  @keyframes mq{to{transform:translateX(-50%)}}
+
+  /* ---------- секции ---------- */
+  section{padding:110px 32px}
+  .sec-head{display:flex;align-items:baseline;gap:24px;border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:64px}
+  .sec-head .num{font-family:var(--mono);font-size:13px;color:var(--red)}
+  .sec-head h2{font-family:var(--disp);font-weight:600;font-size:clamp(24px,4vw,44px);text-transform:uppercase}
+
+  /* ---------- обо мне ---------- */
+  .about-text .lead{font-size:clamp(19px,2.2vw,26px);line-height:1.45;font-weight:500;max-width:820px}
+  .about-text .lead em{font-style:normal;color:var(--red)}
+  .about-text .sub{color:var(--dim);margin-top:22px;max-width:820px}
+  @media(max-width:820px){
+    .about-text .lead,.about-text .sub{max-width:100%}
+  }
+  .facts{margin-top:44px;border-top:1px solid var(--line)}
+  .facts div{display:flex;justify-content:space-between;gap:16px;padding:13px 0;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:13px}
+  .facts dt{color:var(--dim)}
+  .facts dd{color:var(--ink);text-align:right}
+
+  /* ---------- направления ---------- */
+  .svc-item{border-bottom:1px solid var(--line)}
+  .svc-item:first-of-type{border-top:1px solid var(--line)}
+  .svc-btn{width:100%;background:none;border:none;color:inherit;display:flex;align-items:center;gap:24px;padding:26px 0;text-align:left;transition:padding-left .35s cubic-bezier(.2,.8,.2,1)}
+  .svc-btn:hover{padding-left:18px}
+  .svc-btn .idx{font-family:var(--mono);font-size:13px;color:var(--dim);min-width:34px}
+  .svc-btn h3{font-family:var(--disp);font-weight:400;font-size:clamp(18px,3vw,32px);text-transform:uppercase;flex:1;transition:color .3s}
+  .svc-item.open .svc-btn h3,.svc-btn:hover h3{color:var(--red)}
+  .svc-btn .plus{position:relative;width:18px;height:18px;flex:none}
+  .svc-btn .plus::before,.svc-btn .plus::after{content:'';position:absolute;background:var(--ink);transition:transform .35s,background .3s}
+  .svc-btn .plus::before{left:0;top:8px;width:18px;height:2px}
+  .svc-btn .plus::after{left:8px;top:0;width:2px;height:18px}
+  .svc-item.open .plus::after{transform:rotate(90deg)}
+  .svc-item.open .plus::before,.svc-item.open .plus::after{background:var(--red)}
+  .svc-body{max-height:0;overflow:hidden;transition:max-height .5s cubic-bezier(.2,.8,.2,1)}
+  .svc-body-in{padding:0 0 30px 58px;display:grid;grid-template-columns:1.3fr 1fr;gap:40px}
+  .svc-body-in p{color:var(--dim);font-size:15px}
+  .svc-tags{display:flex;flex-wrap:wrap;gap:8px;align-content:start}
+  .svc-tags span{font-family:var(--mono);font-size:11px;letter-spacing:.08em;border:1px solid var(--line);padding:6px 12px;color:var(--dim)}
+  .svc-item.open .svc-body{max-height:460px}
+  @media(max-width:820px){
+    .svc-body-in{grid-template-columns:1fr;padding-left:0;gap:20px}
+  }
+
+  /* ---------- работы ---------- */
+  .work-item{display:flex;align-items:baseline;gap:24px;padding:30px 0;border-bottom:1px solid var(--line);transition:padding-left .35s cubic-bezier(.2,.8,.2,1)}
+  .work-item:first-of-type{border-top:1px solid var(--line)}
+  .work-item:hover{padding-left:18px}
+  .work-item .idx{font-family:var(--mono);font-size:13px;color:var(--dim)}
+  .work-item h3{font-family:var(--disp);font-weight:400;font-size:clamp(20px,3.2vw,38px);text-transform:uppercase;flex:1;transition:color .3s}
+  .work-item:hover h3{color:var(--red)}
+  .work-item .cat{font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase;text-align:right}
+  .work-item .arr{width:22px;height:22px;flex:none;align-self:center;stroke:var(--dim);transition:transform .35s,stroke .3s}
+  .work-item:hover .arr{transform:translate(4px,-4px);stroke:var(--red)}
+  @media(max-width:820px){
+    .work-item{flex-wrap:wrap;gap:10px 16px}
+    .work-item .cat{width:100%;text-align:left}
+  }
+
+  /* ---------- контакты ---------- */
+  .contact{background:var(--red);color:#0c0c0c;padding:120px 32px}
+  .contact .sec-head{border-color:rgba(12,12,12,.25);margin-bottom:48px}
+  .contact .sec-head .num{color:#0c0c0c}
+  .contact .sec-head h2{color:#0c0c0c}
+  .contact-big{font-family:var(--disp);font-weight:800;font-size:clamp(34px,7vw,92px);text-transform:uppercase;line-height:1.05}
+  .contact-big em{font-style:normal;-webkit-text-stroke:2px #0c0c0c;color:transparent}
+  .contact-row{margin-top:64px;display:flex;justify-content:space-between;align-items:flex-end;gap:32px;flex-wrap:wrap}
+  .copy-mail{background:none;border:none;font-family:var(--mono);font-size:clamp(15px,2vw,22px);color:#0c0c0c;border-bottom:2px solid #0c0c0c;padding-bottom:4px;letter-spacing:.03em;transition:opacity .3s}
+  .copy-mail:hover{opacity:.65}
+  .socials{display:flex;gap:18px;flex-wrap:wrap}
+  .socials a{font-family:var(--mono);font-size:13px;letter-spacing:.1em;text-transform:uppercase;border:1px solid #0c0c0c;padding:10px 18px;transition:background .3s,color .3s}
+  .socials a:hover{background:#0c0c0c;color:var(--red)}
+
+  footer{display:flex;justify-content:space-between;padding:24px 32px;font-family:var(--mono);font-size:12px;color:var(--dim);flex-wrap:wrap;gap:12px}
+  footer .up{background:none;border:none;color:var(--ink);font-family:var(--mono);font-size:12px}
+  footer .up:hover{color:var(--red)}
+
+  .toast{position:fixed;bottom:28px;left:50%;transform:translate(-50%,80px);background:var(--ink);color:var(--bg);font-family:var(--mono);font-size:13px;padding:12px 22px;z-index:9999;transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+  .toast.show{transform:translate(-50%,0)}
+  .toast b{color:var(--red)}
+
+  .reveal{opacity:0;transform:translateY(36px);transition:opacity .8s cubic-bezier(.2,.8,.2,1),transform .8s cubic-bezier(.2,.8,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+
+  @media(max-width:820px){
+    nav{display:none}
+    section{padding:80px 20px}
+    .hero{padding:0 20px}
+    .contact{padding:90px 20px}
+    header{padding:16px 20px}
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor-dot"></div>
+
+<header>
+  <a href="#top" class="logo">tkmchw<i>_</i></a>
+  <nav>
+    <a href="#about" data-ru="Обо мне" data-en="About">Обо мне</a>
+    <a href="#services" data-ru="Деятельность" data-en="Services">Деятельность</a>
+    <a href="#works" data-ru="Работы" data-en="Works">Работы</a>
+    <a href="#contact" data-ru="Контакт" data-en="Contact">Контакт</a>
+  </nav>
+  <div class="lang" id="lang">
+    <button class="active" data-lang="ru">RU</button>
+    <button data-lang="en">EN</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero" id="top">
+  <div>
+    <div class="hero-meta">
+      <span data-ru="Личный сайт / портфолио" data-en="Personal site / portfolio">Личный сайт / портфолио</span>
+      <span data-ru="Европа" data-en="Europe">Европа</span>
+    </div>
+    <h1>
+      <span class="row"><span data-ru="Привет, я —" data-en="Hi, I am">Привет, я —</span></span>
+      <span class="row"><span><em>tkmchw</em></span></span>
+    </h1>
+    <div class="hero-bottom">
+      <p data-ru="Молодой и амбициозный. Что бы ни было вашей проблемой — у меня найдётся решение: в любой сфере, в любом формате."
+         data-en="Young and ambitious. Whatever your problem is — I have a solution: in any field, in any format.">
+         Молодой и амбициозный. Что бы ни было вашей проблемой — у меня найдётся решение: в любой сфере, в любом формате.</p>
+      <div class="scroll-cue">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+        <span data-ru="листай вниз" data-en="scroll down">листай вниз</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MARQUEE -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track" id="mq">
+    <span><b>✦</b><span data-ru="Сайты" data-en="Websites">Сайты</span></span>
+    <span><b>✦</b><span data-ru="Дизайн" data-en="Design">Дизайн</span></span>
+    <span><b>✦</b><span data-ru="Презентации" data-en="Presentations">Презентации</span></span>
+    <span><b>✦</b><span data-ru="Инфографика" data-en="Infographics">Инфографика</span></span>
+    <span><b>✦</b><span data-ru="Решения" data-en="Solutions">Решения</span></span>
+    <span><b>✦</b><span data-ru="Проекты" data-en="Projects">Проекты</span></span>
+  </div>
+</div>
+
+<!-- ОБО МНЕ -->
+<section id="about">
+  <div class="sec-head reveal"><span class="num">01</span><h2 data-ru="Обо мне" data-en="About me">Обо мне</h2></div>
+  <div class="about-text reveal">
+    <p class="lead" data-ru="Уже около года я создаю <em>собственные сайты</em> и другие цифровые продукты — от идеи и дизайна до работающего проекта в интернете."
+       data-en="For about a year now I've been building <em>my own websites</em> and other digital products — from idea and design to a live project on the internet.">
+       Уже около года я создаю <em>собственные сайты</em> и другие цифровые продукты — от идеи и дизайна до работающего проекта в интернете.</p>
+    <p class="sub" data-ru="За это время я прошёл путь от первых простых страниц до полноценных проектов, каждый из которых делал лучше предыдущего. Я не боюсь сложных задач — наоборот, именно они дают рост. Мне важно, чтобы результат был не просто «красиво», а работал: приводил людей, объяснял продукт, решал задачу."
+       data-en="In that time I went from my first simple pages to full-fledged projects, each one better than the last. I'm not afraid of complex tasks — on the contrary, they're what make me grow. What matters to me is that the result doesn't just look good, but actually works: brings people in, explains the product, solves the problem.">
+       За это время я прошёл путь от первых простых страниц до полноценных проектов, каждый из которых делал лучше предыдущего. Я не боюсь сложных задач — наоборот, именно они дают рост. Мне важно, чтобы результат был не просто «красиво», а работал: приводил людей, объяснял продукт, решал задачу.</p>
+    <dl class="facts">
+      <div><dt data-ru="Локация" data-en="Location">Локация</dt><dd data-ru="Европа" data-en="Europe">Европа</dd></div>
+      <div><dt data-ru="Опыт" data-en="Experience">Опыт</dt><dd data-ru="Полтора года" data-en="1.5 years">Полтора года</dd></div>
+      <div><dt data-ru="Статус" data-en="Status">Статус</dt><dd data-ru="Открыт к предложениям" data-en="Open to offers">Открыт к предложениям</dd></div>
+    </dl>
+  </div>
+</section>
+
+<!-- ДЕЯТЕЛЬНОСТЬ -->
+<section id="services">
+  <div class="sec-head reveal"><span class="num">02</span><h2 data-ru="Чем занимаюсь" data-en="What I do">Чем занимаюсь</h2></div>
+  <div class="reveal">
+    <div class="svc-item">
+      <button class="svc-btn"><span class="idx">/01</span><h3 data-ru="Сайты под ключ" data-en="Websites end-to-end">Сайты под ключ</h3><span class="plus"></span></button>
+      <div class="svc-body"><div class="svc-body-in">
+        <p data-ru="Создаю сайты для любой сферы бизнеса — от лендингов до многостраничных проектов. Ставку делаю на два главных: красивый, проработанный дизайн и чистый, надёжный функционал. Сайт, который выделяется среди конкурентов и реально выполняет свою задачу."
+           data-en="I build websites for any business field — from landing pages to multi-page projects. Two things matter most: polished, well-crafted design and clean, reliable functionality. A site that stands out from competitors and actually does its job.">
+           Создаю сайты для любой сферы бизнеса — от лендингов до многостраничных проектов. Ставку делаю на два главных: красивый, проработанный дизайн и чистый, надёжный функционал. Сайт, который выделяется среди конкурентов и реально выполняет свою задачу.</p>
+        <div class="svc-tags"><span>landing</span><span>multi-page</span><span>design</span><span>development</span></div>
+      </div></div>
+    </div>
+    <div class="svc-item">
+      <button class="svc-btn"><span class="idx">/02</span><h3 data-ru="Презентации и инфографика" data-en="Presentations & infographics">Презентации и инфографика</h3><span class="plus"></span></button>
+      <div class="svc-body"><div class="svc-body-in">
+        <p data-ru="Уверенно работаю в популярных программах для презентаций и инфографики: Canva, PowerPoint, Figma и других. Помогу красиво и понятно оформить презентацию о вашем продукте — в любом удобном вам формате."
+           data-en="I work confidently with popular presentation and infographic tools: Canva, PowerPoint, Figma and more. I'll help you design a beautiful, clear presentation of your product — in any format you prefer.">
+           Уверенно работаю в популярных программах для презентаций и инфографики: Canva, PowerPoint, Figma и других. Помогу красиво и понятно оформить презентацию о вашем продукте — в любом удобном вам формате.</p>
+        <div class="svc-tags"><span>Canva</span><span>PowerPoint</span><span>Figma</span><span>infographics</span></div>
+      </div></div>
+    </div>
+    <div class="svc-item">
+      <button class="svc-btn"><span class="idx">/03</span><h3 data-ru="Дизайн и визуал" data-en="Design & visuals">Дизайн и визуал</h3><span class="plus"></span></button>
+      <div class="svc-body"><div class="svc-body-in">
+        <p data-ru="Баннеры, обложки, айдентика для соцсетей и небольших брендов. Помогу собрать цельный визуальный стиль, чтобы ваш проект выглядел одинаково уверенно во всех точках контакта с аудиторией."
+           data-en="Banners, covers, identity for social media and small brands. I'll help you build a coherent visual style so your project looks equally confident at every touchpoint with your audience.">
+           Баннеры, обложки, айдентика для соцсетей и небольших брендов. Помогу собрать цельный визуальный стиль, чтобы ваш проект выглядел одинаково уверенно во всех точках контакта с аудиторией.</p>
+        <div class="svc-tags"><span>banners</span><span>identity</span><span>social</span></div>
+      </div></div>
+    </div>
+    <div class="svc-item">
+      <button class="svc-btn"><span class="idx">/04</span><h3 data-ru="Контент и тексты" data-en="Content & copy">Контент и тексты</h3><span class="plus"></span></button>
+      <div class="svc-body"><div class="svc-body-in">
+        <p data-ru="Тексты для сайтов, описания продуктов, структура страниц. Умею говорить просто о сложном: превращать сухие факты в понятное и убедительное сообщение для клиента."
+           data-en="Copy for websites, product descriptions, page structure. I know how to talk about complex things simply: turning dry facts into a clear, convincing message for your customer.">
+           Тексты для сайтов, описания продуктов, структура страниц. Умею говорить просто о сложном: превращать сухие факты в понятное и убедительное сообщение для клиента.</p>
+        <div class="svc-tags"><span>copywriting</span><span>structure</span><span>ux-text</span></div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- РАБОТЫ -->
+<section id="works">
+  <div class="sec-head reveal"><span class="num">03</span><h2 data-ru="Избранные работы" data-en="Selected works">Избранные работы</h2></div>
+  <div class="reveal">
+    <a class="work-item" href="https://tkmchw.github.io/take-energy/" target="_blank" rel="noopener">
+      <span class="idx">01</span><h3>Take Energy</h3><span class="cat" data-ru="Групповая игра — ВШЭ" data-en="Group game — HSE">Групповая игра — ВШЭ</span>
+      <svg class="arr" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
+    </a>
+    <a class="work-item" href="https://tkmchw.github.io/grazhdanskoepravo/" target="_blank" rel="noopener">
+      <span class="idx">02</span><h3 data-ru="Гражданское право" data-en="Civil Law">Гражданское право</h3><span class="cat" data-ru="Интерактивная игра" data-en="Interactive game">Интерактивная игра</span>
+      <svg class="arr" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
+    </a>
+    <a class="work-item" href="https://tkmchw.github.io/eco-wwii/" target="_blank" rel="noopener">
+      <span class="idx">03</span><h3>Eco: WWII</h3><span class="cat" data-ru="Игра об экологии после войны" data-en="Game on post-war ecology">Игра об экологии после войны</span>
+      <svg class="arr" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
+    </a>
+  </div>
+</section>
+
+<!-- КОНТАКТ -->
+<section id="contact" class="contact">
+  <div class="sec-head reveal"><span class="num">04</span><h2 data-ru="Связаться" data-en="Contact">Связаться</h2></div>
+  <div class="reveal">
+    <p class="contact-big">
+      <span data-ru="Давай сделаем" data-en="Let's make">Давай сделаем</span>
+      <em><span data-ru="что-то" data-en="something">что-то</span></em><br>
+      <span data-ru="вместе →" data-en="together →">вместе →</span>
+    </p>
+    <div class="contact-row">
+      <button class="copy-mail" id="mailBtn" data-mail="stastok30rus@icloud.com">stastok30rus@icloud.com</button>
+      <div class="socials">
+        <a href="https://t.me/tkmchw" target="_blank" rel="noopener">Telegram</a>
+        <a href="https://github.com/tkmchw" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://wa.me/79210615402" target="_blank" rel="noopener">WhatsApp</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>© 2026 — tkmchw</span>
+  <button class="up" id="toTop" data-ru="Наверх ↑" data-en="Top ↑">Наверх ↑</button>
+</footer>
+
+<div class="toast" id="toast">
+  <span data-ru="Почта <b>скопирована</b> в буфер обмена" data-en="Email <b>copied</b> to clipboard">Почта <b>скопирована</b> в буфер обмена</span>
+</div>
+
+<script>
+  // ---------- курсор ----------
+  const dot = document.querySelector('.cursor-dot');
+  const isTouch = matchMedia('(hover:none)').matches;
+  if (!isTouch) {
+    addEventListener('mousemove', e => {
+      dot.style.transform = `translate(${e.clientX}px,${e.clientY}px) translate(-50%,-50%)`;
+    });
+  }
+  // курсор чёрный на красной секции
+  const contact = document.getElementById('contact');
+  new IntersectionObserver(entries => {
+    document.body.classList.toggle('on-red', entries[0].isIntersecting);
+  }, { threshold: .15 }).observe(contact);
+
+  // ---------- гарантия открытия с верха страницы ----------
+  addEventListener('beforeunload', () => window.scrollTo(0, 0));
+
+  // ---------- бегущая строка ----------
+  const mq = document.getElementById('mq');
+  mq.innerHTML += mq.innerHTML;
+
+  // ---------- переключение языка ----------
+  const langBox = document.getElementById('lang');
+  const toast = document.getElementById('toast');
+  function setLang(lang){
+    document.querySelectorAll('[data-ru]').forEach(el => {
+      el.innerHTML = el.dataset[lang];
+    });
+    document.documentElement.lang = lang;
+    langBox.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+  }
+  langBox.querySelectorAll('button').forEach(b => {
+    b.addEventListener('click', () => setLang(b.dataset.lang));
+  });
+
+  // ---------- аккордеон ----------
+  document.querySelectorAll('.svc-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.parentElement;
+      const wasOpen = item.classList.contains('open');
+      document.querySelectorAll('.svc-item.open').forEach(i => i.classList.remove('open'));
+      if (!wasOpen) item.classList.add('open');
+    });
+  });
+  document.querySelector('.svc-item').classList.add('open');
+
+  // ---------- появление при скролле ----------
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+  }, { threshold: .12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // ---------- копирование почты ----------
+  let toastTimer;
+  document.getElementById('mailBtn').addEventListener('click', function () {
+    navigator.clipboard.writeText(this.dataset.mail).then(() => {
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
+    });
+  });
+
+  // ---------- кнопка «Наверх» ----------
+  document.getElementById('toTop').addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+</script>
+</body>
+</html>
